@@ -6,7 +6,11 @@ module "network" {
   region       = var.region
   vpc_cidr     = var.vpc_cidr
   
-  inbound_rules = var.inbound_rules
+  inbound_rules_public = var.inbound_rules_public
+  inbound_rules_private = var.inbound_rules_private
+  outbound_rules_public = var.outbound_rules_public
+  outbound_rules_private = var.outbound_rules_private
+
   droplet_ids   = module.compute.all_droplet_ids
   droplet_workers_ids   = module.compute.worker_ids
   

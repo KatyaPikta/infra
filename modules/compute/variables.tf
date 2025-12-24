@@ -58,9 +58,3 @@ variable "tags" {
   description = "Tags for droplets"
   default     = []
 }
-
-variable "enable_monitoring" {
-  type        = bool
-  description = "Enable droplet monitoring"
-  default     = false
-}

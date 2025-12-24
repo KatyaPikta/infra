@@ -9,33 +9,23 @@ resource "digitalocean_firewall" "firewall" {
   name = "${var.project_name}-${var.environment}-firewall"
   droplet_ids = var.droplet_workers_ids
   
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = ["0.0.0.0/0", "::/0"]
+  dynamic "inbound_rule" {
+    for_each = var.inbound_rules_public
+    content {
+      protocol          = inbound_rule.value.protocol
+      port_range        = inbound_rule.value.port_range
+      source_addresses  = inbound_rule.value.source_addresses
+      source_droplet_ids = try(inbound_rule.value.source_droplet_ids, null)
+    }
   }
   
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "443"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "icmp"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "tcp"
-    port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "udp"
-    port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+  dynamic "outbound_rule" {
+    for_each = var.outbound_rules_public
+    content {
+      protocol               = outbound_rule.value.protocol
+      port_range            = outbound_rule.value.protocol != "icmp" ? outbound_rule.value.port_range : null
+      destination_addresses  = outbound_rule.value.destination_addresses
+    }
   }  
 }
 
@@ -44,54 +34,24 @@ resource "digitalocean_firewall" "attach_firewall" {
   name = "${var.project_name}-${var.environment}-firewall-attach"
   droplet_ids = var.droplet_ids
   
-  
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "22"
-    source_addresses = ["0.0.0.0/0", "::/0"]
+  dynamic "inbound_rule" {
+    for_each = var.inbound_rules_private
+    content {
+      protocol          = inbound_rule.value.protocol
+      port_range        = inbound_rule.value.port_range
+      source_addresses  = inbound_rule.value.source_addresses
+      source_droplet_ids = try(inbound_rule.value.source_droplet_ids, null)
+    }
   }
   
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "6443"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "10250-10259"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-  
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "all"
-    source_addresses = ["10.20.0.4", "10.20.0.3", "10.20.0.2"]
-  }
-
-  inbound_rule {
-    protocol         = "udp"
-    port_range       = "all"
-    source_addresses = ["10.20.0.4", "10.20.0.3", "10.20.0.2"]
-  }
-  
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "30000-32767"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "tcp"
-    port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
-  }
-  
-  outbound_rule {
-    protocol              = "udp"
-    port_range            = "all"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
+  dynamic "outbound_rule" {
+    for_each = var.outbound_rules_private
+    content {
+      protocol               = outbound_rule.value.protocol
+      port_range            = outbound_rule.value.protocol != "icmp" ? outbound_rule.value.port_range : null
+      destination_addresses  = outbound_rule.value.destination_addresses
+    }
+  }  
+ 
   tags = var.tags
 }

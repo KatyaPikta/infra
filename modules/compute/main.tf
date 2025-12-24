@@ -14,8 +14,6 @@ resource "digitalocean_droplet" "control_plane" {
   vpc_uuid = var.vpc_id
   tags     = concat(["control-plane", "k8s-master"], var.tags)
   
-  monitoring = var.enable_monitoring
-  
   connection {
     type        = "ssh"
     user        = "root"
@@ -40,8 +38,6 @@ resource "digitalocean_droplet" "workers" {
   ssh_keys = [digitalocean_ssh_key.ssh_key.fingerprint]
   vpc_uuid = var.vpc_id
   tags     = concat(["worker", "k8s-node"], var.tags)
-  
-  monitoring = var.enable_monitoring
   
   connection {
     type        = "ssh"

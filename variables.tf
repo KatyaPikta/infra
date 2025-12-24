@@ -15,11 +15,6 @@ variable "region" {
   default     = "fra1"
 }
 
-variable "domain_name" {
-  description = "Domain name to register"
-  default     = "task3.app"
-}
-
 variable "environment" {
   type        = string
   description = "Environment name"
@@ -32,7 +27,7 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "inbound_rules" {
+variable "inbound_rules_public" {
   type = list(object({
     protocol          = string
     port_range        = string
@@ -42,7 +37,26 @@ variable "inbound_rules" {
   default = []
 }
 
-variable "outbound_rules" {
+variable "inbound_rules_private" {
+  type = list(object({
+    protocol          = string
+    port_range        = string
+    source_addresses  = list(string)
+    source_droplet_ids = optional(list(string))
+  }))
+  default = []
+}
+
+variable "outbound_rules_public" {
+  type = list(object({
+    protocol              = string
+    port_range            = string
+    destination_addresses = list(string)
+  }))
+  default = []
+}
+
+variable "outbound_rules_private" {
   type = list(object({
     protocol              = string
     port_range            = string
@@ -87,25 +101,7 @@ variable "tags" {
   default     = []
 }
 
-variable "enable_monitoring" {
-  type        = bool
-  description = "Enable droplet monitoring"
-  default     = false
-}
-
 variable "ssh_public_key_path" {
   type        = string
   description = "Path to SSH public key"
-}
-
-variable "volume_count" {
-  type        = number
-  description = "Number of volumes to create"
-  default     = 0
-}
-
-variable "volume_size_gb" {
-  type        = number
-  description = "Size of each volume in GB"
-  default     = 50
 }
