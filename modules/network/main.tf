@@ -7,34 +7,43 @@ resource "digitalocean_vpc" "vpc" {
 
 resource "digitalocean_firewall" "firewall" {
   name = "${var.project_name}-${var.environment}-firewall"
+  droplet_ids = var.droplet_workers_ids
   
-  droplet_ids = var.droplet_ids
-  
-  dynamic "inbound_rule" {
-    for_each = var.inbound_rules
-    content {
-      protocol          = inbound_rule.value.protocol
-      port_range        = inbound_rule.value.port_range
-      source_addresses  = inbound_rule.value.source_addresses
-      source_droplet_ids = try(inbound_rule.value.source_droplet_ids, null)
-    }
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = ["0.0.0.0/0", "::/0"]
   }
   
-  dynamic "outbound_rule" {
-    for_each = var.outbound_rules
-    content {
-      protocol               = outbound_rule.value.protocol
-      port_range            = outbound_rule.value.protocol != "icmp" ? outbound_rule.value.port_range : null
-      destination_addresses  = outbound_rule.value.destination_addresses
-    }
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "443"
+    source_addresses = ["0.0.0.0/0", "::/0"]
   }
+
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }  
 }
 
 resource "digitalocean_firewall" "attach_firewall" {
-  count = length(var.droplet_ids) > 0 ? 1 : 0
-  
+   
   name = "${var.project_name}-${var.environment}-firewall-attach"
   droplet_ids = var.droplet_ids
+  
   
   inbound_rule {
     protocol         = "tcp"
@@ -42,11 +51,47 @@ resource "digitalocean_firewall" "attach_firewall" {
     source_addresses = ["0.0.0.0/0", "::/0"]
   }
   
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "6443"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "10250-10259"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+  
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "all"
+    source_addresses = ["10.20.0.4", "10.20.0.3", "10.20.0.2"]
+  }
+
+  inbound_rule {
+    protocol         = "udp"
+    port_range       = "all"
+    source_addresses = ["10.20.0.4", "10.20.0.3", "10.20.0.2"]
+  }
+  
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "30000-32767"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
   outbound_rule {
     protocol              = "tcp"
-    port_range            = "1-65535"
+    port_range            = "all"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
   
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
   tags = var.tags
 }

@@ -8,6 +8,8 @@ module "network" {
   
   inbound_rules = var.inbound_rules
   droplet_ids   = module.compute.all_droplet_ids
+  droplet_workers_ids   = module.compute.worker_ids
+  
 }
 
 module "compute" {
@@ -24,16 +26,4 @@ module "compute" {
   worker_size         = var.worker_size
   
   ssh_public_key_path = var.ssh_public_key_path
-}
-
-module "persistence" {
-  source = "./modules/persistence"
-  
-  project_name = var.project_name
-  environment  = terraform.workspace
-  region       = var.region
-  
-  volume_count   = var.volume_count
-  volume_size_gb = var.volume_size_gb
-  droplet_ids    = module.compute.worker_ids
 }

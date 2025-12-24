@@ -1,14 +1,12 @@
-# SSH ключ
 resource "digitalocean_ssh_key" "ssh_key" {
   name       = "${var.project_name}-${var.environment}-ssh-key"
   public_key = file(var.ssh_public_key_path)
 }
 
-# Control Plane Nodes
 resource "digitalocean_droplet" "control_plane" {
   count = var.control_plane_count
   
-  name     = "${var.project_name}-${var.environment}-cp-${count.index + 1}"
+  name     = "master"
   image    = var.os_image
   region   = var.region
   size     = var.control_plane_size
@@ -25,7 +23,6 @@ resource "digitalocean_droplet" "control_plane" {
     host        = self.ipv4_address
   }
   
-  # Cloud-init для K8s
   user_data = templatefile("${path.module}/templates/cloud-init.yaml", {
     node_type    = "control-plane"
     environment  = var.environment
@@ -33,11 +30,10 @@ resource "digitalocean_droplet" "control_plane" {
   })
 }
 
-# Worker Nodes
 resource "digitalocean_droplet" "workers" {
   count = var.worker_count
   
-  name     = "${var.project_name}-${var.environment}-worker-${count.index + 1}"
+  name     = "worker${count.index + 1}"
   image    = var.os_image
   region   = var.region
   size     = var.worker_size

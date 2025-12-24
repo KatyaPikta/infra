@@ -15,6 +15,11 @@ variable "region" {
   default     = "fra1"
 }
 
+variable "domain_name" {
+  description = "Domain name to register"
+  default     = "task3.app"
+}
+
 variable "environment" {
   type        = string
   description = "Environment name"

@@ -25,9 +25,38 @@ variable "droplet_ids" {
   default     = []
 }
 
+variable "droplet_workers_ids" {
+  type        = list(string)
+  description = "List of droplet workers IDs to attach to firewall"
+  default     = []
+}
+
 variable "tags" {
   type        = list(string)
   description = "Tags for resources"
+  default     = []
+}
+
+variable "cluster_private_ips" {
+  description = "Private IPs of all cluster nodes for internal communication"
+  type        = list(string)
+  default     = []
+}
+
+variable "allow_cluster_internal_traffic" {
+  description = "Whether to allow all traffic between cluster nodes"
+  type        = bool
+  default     = true
+}
+
+variable "domain_name" {
+  description = "Domain name to register"
+  default     = "task3.app"
+}
+
+variable "loadbalancer_ids"{
+  type        = list(string)
+  description = "List of load balancer"
   default     = []
 }
 
