@@ -1,0 +1,51 @@
+deployment:
+  kind: DaemonSet
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+
+
+securityContext:
+  capabilities:
+    add:
+      - NET_BIND_SERVICE
+  runAsNonRoot: false
+  runAsUser: 0
+
+ports:
+  web:
+    port: 80
+    hostPort: 80
+  websecure:
+    port: 443
+    hostPort: 443
+  traefik:
+    port: 9000
+    hostPort: 9000
+
+service:
+  type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
+    service.beta.kubernetes.io/do-loadbalancer-algorithm: "round_robin"
+
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+
+additionalArguments:
+  - "--api.dashboard=true"
+  - "--api.insecure=true"
+  - "--log.level=INFO"
+  - "--entrypoints.web.address=:80"
+  - "--entrypoints.websecure.address=:443"
+  - "--entrypoints.traefik.address=:9000"
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "100m"
+  limits:
+    memory: "128Mi"
+    cpu: "500m"

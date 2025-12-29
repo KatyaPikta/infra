@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloud-controller-manager
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:cloud-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: cloud-controller-manager
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digitalocean-cloud-controller-manager
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: digitalocean-cloud-controller-manager
+  template:
+    metadata:
+      labels:
+        app: digitalocean-cloud-controller-manager
+    spec:
+      serviceAccountName: cloud-controller-manager
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+      containers:
+      - name: digitalocean-cloud-controller-manager
+        image: digitalocean/digitalocean-cloud-controller-manager:v0.1.64
+        command: ["/bin/digitalocean-cloud-controller-manager"]
+        args:
+        - --leader-elect=true
+        - --cloud-provider=digitalocean
+        - --cluster-name=cluster.local
+        - --v=2  
+        env:
+        - name: DO_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: digitalocean
+              key: access-token
+        volumeMounts:
+        - name: cloud-config
+          mountPath: /etc/kubernetes
+          readOnly: true
+      volumes:
+      - name: cloud-config
+        secret:
+          secretName: digitalocean
