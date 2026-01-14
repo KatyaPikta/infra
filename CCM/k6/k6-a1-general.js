@@ -31,6 +31,7 @@ postman[Symbol.for("initial")]({
   }
 });
 
+// the same function description in all scenarios, could be set somewhere and be imported
 export default function() {
   postman[Request]({
     name: "get page",

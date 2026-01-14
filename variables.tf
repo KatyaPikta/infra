@@ -15,6 +15,7 @@ variable "region" {
   default     = "fra1"
 }
 
+# no usages
 variable "environment" {
   type        = string
   description = "Environment name"
@@ -27,11 +28,12 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
+# no description
 variable "inbound_rules_public" {
   type = list(object({
-    protocol          = string
-    port_range        = string
-    source_addresses  = list(string)
+    protocol           = string
+    port_range         = string
+    source_addresses   = list(string)
     source_droplet_ids = optional(list(string))
   }))
   default = []
@@ -39,9 +41,9 @@ variable "inbound_rules_public" {
 
 variable "inbound_rules_private" {
   type = list(object({
-    protocol          = string
-    port_range        = string
-    source_addresses  = list(string)
+    protocol           = string
+    port_range         = string
+    source_addresses   = list(string)
     source_droplet_ids = optional(list(string))
   }))
   default = []
@@ -89,12 +91,14 @@ variable "worker_size" {
   default     = "s-2vcpu-4gb"
 }
 
+# no usages
 variable "os_image" {
   type        = string
   description = "OS image slug"
   default     = "ubuntu-22-04-x64"
 }
 
+# no usages
 variable "tags" {
   type        = list(string)
   description = "Tags for droplets"
