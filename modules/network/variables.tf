@@ -39,12 +39,12 @@ variable "tags" {
 
 variable "inbound_rules_public" {
   type = list(object({
-    protocol          = string
-    port_range        = string
-    source_addresses  = list(string)
+    protocol           = string
+    port_range         = string
+    source_addresses   = list(string)
     source_droplet_ids = optional(list(string))
   }))
-  
+
 }
 
 
@@ -54,14 +54,14 @@ variable "outbound_rules_public" {
     port_range            = string
     destination_addresses = list(string)
   }))
-    
+
 }
 
 variable "inbound_rules_private" {
   type = list(object({
-    protocol          = string
-    port_range        = string
-    source_addresses  = list(string)
+    protocol           = string
+    port_range         = string
+    source_addresses   = list(string)
     source_droplet_ids = optional(list(string))
   }))
 }
@@ -71,5 +71,5 @@ variable "outbound_rules_private" {
     protocol              = string
     port_range            = string
     destination_addresses = list(string)
-  }))  
+  }))
 }

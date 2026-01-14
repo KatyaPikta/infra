@@ -55,6 +55,7 @@ export default function() {
       "Sec-Fetch-Mode": "navigate",
       "Sec-Fetch-User": "?1",
       "Sec-Fetch-Dest": "document",
+//      task 2?
       host: "task2.local"
     },
     post(response) {
