@@ -6,14 +6,14 @@ resource "digitalocean_ssh_key" "ssh_key" {
 resource "digitalocean_droplet" "control_plane" {
   count = var.control_plane_count
   
-  name     = "master"
+  name     = "master${count.index + 1}"
   image    = var.os_image
   region   = var.region
   size     = var.control_plane_size
   ssh_keys = [digitalocean_ssh_key.ssh_key.fingerprint]
   vpc_uuid = var.vpc_id
   tags     = concat(["control-plane", "k8s-master"], var.tags)
-  
+
   connection {
     type        = "ssh"
     user        = "root"
@@ -38,14 +38,14 @@ resource "digitalocean_droplet" "workers" {
   ssh_keys = [digitalocean_ssh_key.ssh_key.fingerprint]
   vpc_uuid = var.vpc_id
   tags     = concat(["worker", "k8s-node"], var.tags)
-  
+
   connection {
     type        = "ssh"
     user        = "root"
     private_key = file(replace(var.ssh_public_key_path, ".pub", ""))
     host        = self.ipv4_address
   }
-  
+
   user_data = templatefile("${path.module}/templates/cloud-init.yaml", {
     node_type    = "worker"
     environment  = var.environment
